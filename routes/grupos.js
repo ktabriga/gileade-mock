@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const pessoas = require('../models/pessoas');
-const grupos = require('../models/grupos');
+let grupos = require('../models/grupos');
 const _ = require('lodash');
 const moment = require('moment');
 
@@ -39,6 +39,13 @@ router.get('/grupos', (req, res) => {
 router.post('/grupos', (req, res) => {
   const grupo = req.body;
   grupo.id = ++lastId;
+  grupos.push(grupo);
+  res.json(grupo);
+});
+
+router.put('/grupos', (req, res) => {
+  const grupo = req.body;
+  grupos = grupos.filter(g => g.id !== grupo.id);
   grupos.push(grupo);
   res.json(grupo);
 });
