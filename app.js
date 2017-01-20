@@ -11,6 +11,11 @@ var users = require('./routes/users');
 const pessoas = require('./routes/pessoas');
 const grupos = require('./routes/grupos');
 
+const login = require('./routes/kids/login')
+const pessoapre = require('./routes/kids/pessoapre')
+const reunioes = require('./routes/kids/reunioes')
+const usuario = require('./routes/kids/usuario')
+
 var app = express();
 
 // view engine setup
@@ -21,15 +26,20 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(cors());
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '5mb'}));
+app.use(bodyParser.urlencoded({ limit: '5mb', extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //app.use('/', routes);
-app.use('/', pessoas);
-app.use('/', grupos);
+//app.use('/', pessoas);
+//app.use('/', grupos);
 // app.use('/users', users);
+
+app.use('/', pessoapre);
+app.use('/', login);
+app.use('/', reunioes);
+app.use('/', usuario);
 
 
 // catch 404 and forward to error handler
