@@ -4,9 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var delay = require('express-delay');
 const cors = require('cors');
 
 var routes = require('./routes/index');
+
+
 var users = require('./routes/users');
 const pessoas = require('./routes/pessoas');
 const grupos = require('./routes/grupos');
@@ -15,7 +18,17 @@ const login = require('./routes/kids/login')
 const pessoapre = require('./routes/kids/pessoapre')
 const reunioes = require('./routes/kids/reunioes')
 const usuario = require('./routes/kids/usuario')
+const visitante = require('./routes/kids/visitante')
 
+/*
+const login = require('./routes/kids/login')
+const home = require('./routes/kids/home-new')
+const reuniao = require('./routes/kids/reuniao-new')
+const visitante = require('./routes/kids/visitante-new')
+const configuracao = require('./routes/kids/configuracao-new')
+const familia = require('./routes/kids/familia-new')
+const pessoa = require('./routes/kids/pessoa-new')
+*/
 var app = express();
 
 // view engine setup
@@ -31,15 +44,17 @@ app.use(bodyParser.urlencoded({ limit: '5mb', extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use('/', routes);
-//app.use('/', pessoas);
-//app.use('/', grupos);
-// app.use('/users', users);
+app.use(delay(200, 3000));
 
-app.use('/', pessoapre);
+app.use('/', users);
+app.use('/', pessoas);
+app.use('/', grupos);
 app.use('/', login);
+app.use('/', pessoapre);
 app.use('/', reunioes);
 app.use('/', usuario);
+app.use('/', visitante);
+
 
 
 // catch 404 and forward to error handler

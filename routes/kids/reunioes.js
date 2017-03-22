@@ -3,9 +3,11 @@ var router = express.Router()
 const _ = require('lodash');
 const moment = require('moment');
 
+let index = 0;
+
 function createReunioes(data) {
-  return _.range(3).map(x => 10 + x * 5).map(x => ({
-    nome: `REUNIÃO ${data.month() + 1}`,
+  return _.range(1).map(x => 10 + x * 5).map(x => ({
+    nome: `${index++}: REUNIÃO ${data.month() + 1}`,
     dhInicio: data.clone().day(x).hours(8).toISOString(),
     dhFinal: data.clone().day(x).hours(12).toISOString(),
   }))
@@ -13,48 +15,28 @@ function createReunioes(data) {
 }
 
 router.get("/api/pessoapre/:id/reunioes", (req, res) => {
-  let {startMonth, count = 1} = req.query;
-  if (startMonth) {
-    startMonth = startMonth -1;
-  } else {
-     startMonth = new Date().getMonth()
-  }
-  
-  if(startMonth < 0)
-    return res.json({value: []})
-  const start = moment().month(startMonth).startOf('month');
+  const {start=0, pageSize = 10} = req.query;
+  const count = 100;
 
+  const indexComeco = 0 > start*1 ? 0 : start*1
+  const indexFim = (indexComeco*1 + pageSize*1) < count ? (indexComeco*1 + pageSize*1) : count
+
+  const startOfMonth = moment().month(new Date().getMonth()).startOf('month')
+
+  index = 0;
   const theValues = _.range(count)
     .map(x => {
-      return start.clone().add(x, 'months')
+      return startOfMonth.clone().add(x, 'months')
     })
     .map(createReunioes)
 
-  //theValues.push({
-  //    nome: `REUNIÃO HOJE`,
-  //    dhInicio: new Date().toISOString(),
-  //    dhFinal: moment(new Date()).endOf('day').toISOString()
-  //  })
+  res.json({
+    "pageSize": pageSize,
+    "count": count,
+    "start": start,
+    values: _.flatten(theValues).slice(indexComeco, indexFim)
+  });
 
-  onlyOne = [
-    {
-    nome: `REUNIÃO PASSADA 1 HR`,
-    dhInicio: moment(new Date()).subtract(2, 'hour').toISOString(),
-    dhFinal: moment(new Date()).subtract(1, 'hour').toISOString()
-    },
-    {
-    nome: `REUNIÃO ANDAMENTO`,
-    dhInicio: new Date().toISOString(),
-    dhFinal: moment(new Date()).add(2, 'hour').toISOString(),
-    },
-    {
-    nome: `REUNIÃO FUTURO 4 HR`,
-    dhInicio: moment(new Date()).add(4, 'hour').toISOString(),
-    dhFinal: moment(new Date()).add(6, 'hour').toISOString()
-    }
-  ]
-
-  res.json({values: _.flatten(theValues)});
 });
 
 module.exports = router;
